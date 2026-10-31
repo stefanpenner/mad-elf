@@ -1,0 +1,8 @@
+.section .text
+.global _start
+_start:
+    mov $60, %rax
+    xor %rdi, %rdi
+    syscall
+
+.section .note.GNU-stack,"",@progbits

@@ -1,0 +1,7 @@
+# Example directives. `mad-elf install` writes loader= itself from the
+# binary's original PT_INTERP; do not copy this file over that line.
+# On Linux, flag= is inserted into argv. On macOS the constructor inserts
+# the same flag into argv by re-execing the binary once.
+flag=--disallow-code-generation-from-strings
+setenv=MADELF_PROFILE=strict
+mergeenv=NODE_OPTIONS=--zero-fill-buffers
