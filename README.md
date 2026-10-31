@@ -5,7 +5,7 @@ The configuration is part of the binary.
 A wrapper on `PATH` does not do this, because a caller can start the real binary and ignore the wrapper.
 
 The primary target is Node.js.
-You can see the marker from the process (`process.env.MADELF_SHIM`, `process.execArgv`) and from outside (`mad-elf detect <pid>`).
+You can see the marker from the process (`process.env.MADELF_SHIM`, `process.execArgv`) and from outside (`build/mad-elf detect <pid>`).
 The caller does not set environment variables.
 
 ## Linux
@@ -54,8 +54,8 @@ process.env.MADELF_SHIM === "1"
 ```
 
 ```bash
-mad-elf detect <pid>   # exit 0 if this process is a Mad Elf start
-mad-elf inspect <file>
+build/mad-elf detect <pid>   # exit 0 if this process is a Mad Elf start
+build/mad-elf inspect <file>
 ```
 
 ## Install
@@ -64,14 +64,14 @@ mad-elf inspect <file>
 make
 
 # Linux
-python3 mad-elf install --flag --no-warnings \
+build/mad-elf install --flag --no-warnings \
   "$(command -v node)" ./build/node-madelf
 
 # macOS
 clang -dynamiclib -o /opt/mad-elf/lib/libmadelf.dylib \
   -Wl,-install_name,/opt/mad-elf/lib/libmadelf.dylib \
   src/shim_darwin.c src/logic.c
-python3 mad-elf install --dylib /opt/mad-elf/lib/libmadelf.dylib \
+build/mad-elf install --dylib /opt/mad-elf/lib/libmadelf.dylib \
   --flag --no-warnings "$(command -v node)" ./build/node-madelf
 ```
 

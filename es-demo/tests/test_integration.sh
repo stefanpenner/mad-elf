@@ -39,8 +39,13 @@ int main(void) { puts("ok"); return 0; }
 EOF
 cp "$WORK/allowed-helper" "$WORK/denied-helper"
 chmod 755 "$WORK/allowed-helper" "$WORK/denied-helper"
-ALLOWED="$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$WORK/allowed-helper")"
-DENIED="$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$WORK/denied-helper")"
+phys() {
+  local dir
+  dir="$(cd "$(dirname "$1")" && pwd -P)"
+  printf '%s/%s\n' "$dir" "$(basename "$1")"
+}
+ALLOWED="$(phys "$WORK/allowed-helper")"
+DENIED="$(phys "$WORK/denied-helper")"
 
 ALLOW="$DIR/allowlist"
 MODE="$DIR/mode"

@@ -6,7 +6,7 @@ ARCH := $(shell uname -m)
 
 .PHONY: all test clean
 
-all: $(BUILD)/test-logic $(BUILD)/test-policy $(BUILD)/mad-elf-es
+all: $(BUILD)/mad-elf $(BUILD)/test-logic $(BUILD)/test-policy $(BUILD)/test-macho $(BUILD)/test-elf $(BUILD)/mad-elf-es
 ifeq ($(UNAME_S),Linux)
 ifeq ($(ARCH),x86_64)
 all: $(BUILD)/mad-elf-shim
@@ -15,6 +15,15 @@ endif
 
 $(BUILD):
 	mkdir -p $(BUILD)
+
+$(BUILD)/mad-elf: src/madelf_cli.c src/madelf_elf.c src/madelf_macho.c src/madelf_elf.h src/madelf_macho.h | $(BUILD)
+	$(CC) $(CFLAGS) -D_GNU_SOURCE -D_DARWIN_C_SOURCE -o $@ src/madelf_cli.c src/madelf_elf.c src/madelf_macho.c
+
+$(BUILD)/test-macho: tests/test_macho.c src/madelf_macho.c src/madelf_macho.h | $(BUILD)
+	$(CC) $(CFLAGS) -D_GNU_SOURCE -D_DARWIN_C_SOURCE -Isrc -o $@ tests/test_macho.c src/madelf_macho.c
+
+$(BUILD)/test-elf: tests/test_elf.c src/madelf_elf.c src/madelf_elf.h | $(BUILD)
+	$(CC) $(CFLAGS) -D_GNU_SOURCE -D_DARWIN_C_SOURCE -Isrc -o $@ tests/test_elf.c src/madelf_elf.c
 
 $(BUILD)/mad-elf-shim: src/shim.c src/entry_x86_64.S src/logic.c src/logic.h | $(BUILD)
 	$(CC) -nostdlib -static-pie -ffreestanding -fno-builtin -fno-stack-protector \
@@ -39,11 +48,13 @@ test: all
 	./$(BUILD)/test-policy
 	bash es-demo/tests/test_cli.sh
 	bash es-demo/tests/test_integration.sh
-	python3 tests/test_macho.py
-	python3 tests/test_darwin.py
+	bash tests/test_cli.sh
+	bash tests/test_darwin.sh
+	./$(BUILD)/test-macho
+	./$(BUILD)/test-elf
 ifeq ($(UNAME_S),Linux)
 ifeq ($(ARCH),x86_64)
-	python3 tests/test_linux.py
+	bash tests/test_linux.sh
 endif
 endif
 
